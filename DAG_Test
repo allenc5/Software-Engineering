@@ -28,8 +28,6 @@ public class DAGTest {
 	@Test(expected=Exception.class)
 	public void exceptionTest(){
 		
-		//Can't make a DAG with less than 0 vertices 
-		
 		DAG graph = new DAG(-5); //will return "Please enter numbers between 0 and 4"
 	}
 	
@@ -40,10 +38,8 @@ public class DAGTest {
 		
 		graph.addEdge(1,2);
 
-		//As these are negative, the program will print a system error and not addEdge
 		graph.addEdge(-1, -6);
 		
-		//This will not work as 12 > 5
 		graph.addEdge(3, 12);
 		
 		assertEquals(1, graph.E());
@@ -172,15 +168,12 @@ public class DAGTest {
 		graph.addEdge(1, 5);
 		graph.addEdge(2, 5);
 		
-		//Checks to see if LCA function works
 		assertEquals(0, graph.findLCA(2, 1));
 		assertEquals(3, graph.findLCA(2, 3));
 		assertEquals(2, graph.findLCA(4, 5));
 		
-		//Checks for absent vertex
 		assertEquals(-1, graph.findLCA(8, 2));
 		
-		//Checks for negative vertex
 		assertEquals(-1, graph.findLCA(-2, 3));
 		assertEquals(-1, graph.findLCA(3, -2));
 		assertEquals(-1, graph.findLCA(-2, -3));
