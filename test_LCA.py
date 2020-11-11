@@ -13,6 +13,7 @@ class TestLCA(unittest.TestCase):
 		root = Node(1)
 		self.assertEqual(1, root.key)
 
+		
 	def testFindLCA(self):
 
 		root = Node(1)
@@ -43,6 +44,17 @@ class TestLCA(unittest.TestCase):
 		self.assertEqual(findLCA(root, 4, 6).key, 1)
 		self.assertEqual(findLCA(root, 2, 5).key, 2)
 		self.assertEqual(findLCA(root, 3, 4).key, 1)
+	
+	
+	def test_empty_tree(self):
+
+        	root = None
+        	assert lca(root, 8, 3) is None
+		
+		
+	def test_LCA_none_node(self):
+       
+        	assert lca(None, 1, 3) is None	
 
 
 
