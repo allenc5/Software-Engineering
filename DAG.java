@@ -4,16 +4,15 @@ import java.util.LinkedList;
 
 public class DAG
 {
-	private int V;							//number of vertices in the graph
-	private int E;							//number of edges in the graph
-	private ArrayList<Integer>[] adjacent;  //adjacent[V] = adjacency list for vertex V
+	private int V;						//number of vertices in the graph
+	private int E;						//number of edges in the graph
+	private ArrayList<Integer>[] adjacent;  		//adjacent[V] = adjacency list for vertex V
 	private int [] indegree;				//indegree[V] = indegree of vertex V
 	
 	private boolean marked [];				//list of visited vertices
 	private boolean hasCycle;				//True if graph has cycle and therefore doesn't meet DAG criteria
 	private boolean stack [];				//
 	
-	//constructor to initialize an empty graph with size V
 	public DAG(int V)
 	{
 		if(V < 0)
@@ -34,19 +33,16 @@ public class DAG
 		}
 	}
 	
-	//returns number of current vertices in DAG
 	public int V()
 	{
 		return V;
 	}
 	
-	//returns number of edges in DAG
 	public int E()
 	{
 		return E;
 	}
 	
-	//Adds directed edge from v to w
 	public void addEdge(int v, int w)
 	{
 		if((validateVertex(v) > 0) && (validateVertex(w) > 0))
@@ -61,7 +57,6 @@ public class DAG
 		}		
 	}
 	
-	//checks if the vertex inputed is out of bounds
 	private int validateVertex(int v)
 	{
 		if(v < 0 || v >= V)
@@ -74,7 +69,6 @@ public class DAG
 		}
 	}
 	
-	//Returns number of directed edges to vertex v
 	public int indegree(int v)
 	{
 		if(validateVertex(v) > 0)
@@ -88,7 +82,6 @@ public class DAG
 		
 	}
 	
-	//Returns number of directed edges from vertex v
 	public int outdegree(int v)
 	{
 		if(validateVertex(v) > 0)
@@ -101,18 +94,15 @@ public class DAG
 		}
 	}
 	
-	//Returns the adjacent vertices to v
 	public Iterable<Integer> adjacent(int v)
 	{
 		return adjacent[v];
 	}
 	
-	//returns hasCycle boolean
 	public boolean hasCycle()
 	{
 		return hasCycle;
 	}
-	//Checks if graph is a DAG and changes boolean values.
 	public void findCycle(int v)
 	{
 		marked[v] = true;
@@ -133,7 +123,6 @@ public class DAG
 		stack[v] = false;
 	}
 	
-	//This public function is used implement the lowest common ancestor in a directed acyclic graph
 	public int findLCA(int v, int w)
 	{
 		findCycle(0);
@@ -184,7 +173,6 @@ public class DAG
 		}
 	}
 	
-	//Prints Breadth-First search from source s
 	public ArrayList<Integer> BFS(int s)
 	{
 		ArrayList<Integer> order = new ArrayList<Integer>();
@@ -216,7 +204,6 @@ public class DAG
 		return order;
 	}
 	
-	//Reverse DAG
 	public DAG reverse()
 	{
 		DAG reverse = new DAG(V);
