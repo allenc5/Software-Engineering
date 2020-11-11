@@ -1,8 +1,8 @@
-//This test Class will test the implementation of the DAG Class.
-
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+//This Class will test the implementation of the DAG Class.
 
 public class DAGTest {
 
