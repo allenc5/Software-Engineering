@@ -4,9 +4,9 @@ import java.util.LinkedList;
 
 public class DAG
 {
-	private int V;							//number of vertices in the graph
-	private int E;							//number of edges in the graph
-	private ArrayList<Integer>[] adjacent;  //adjacent[V] = adjacency list for vertex V
+	private int V;						//num vertices in graph
+	private int E;						//num edges in graph
+	private ArrayList<Integer>[] adjacent;  		//adjacent[V] = adjacency list for vertex V
 	private int [] indegree;				//indegree[V] = indegree of vertex V
 	
 	private boolean marked [];				//list of visited vertices
@@ -103,7 +103,6 @@ public class DAG
 	{
 		return hasCycle;
 	}
-	
 	public void findCycle(int v)
 	{
 		marked[v] = true;
@@ -128,18 +127,16 @@ public class DAG
 	{
 		findCycle(0);
 		
-		if(hasCycle) //Graph is not DAG
+		if(hasCycle) 
 		{
 			return -1;
 		}
 		else if(validateVertex(v) < 0 || validateVertex(w) < 0)
 		{
-			//Not valid vertices, ie. non-negative
 			return -1;
 		}
 		else if(E == 0)
 		{
-			//Graph has no edges, ie. empty
 			return -1;
 		}
 		
@@ -165,12 +162,11 @@ public class DAG
 		
 		if(found)
 		{
-			//Return first element in list - Lowest Common Ancestor
 			return commonAncestors.get(0);
 		}
 		else
 		{
-			return -1; //None found
+			return -1; 
 		}
 	}
 	
@@ -185,11 +181,9 @@ public class DAG
 		
 		while(queue.size() != 0)
 		{
-			s = queue.poll(); //Sets s to the head of the list
+			s = queue.poll(); 
 			order.add(s);
 			
-			//Find adjacent vertices to s. If not visited,
-			//mark as visited (true) and enqueue
 			Iterator<Integer> i = adjacent[s].listIterator();
 			
 			while(i.hasNext())
