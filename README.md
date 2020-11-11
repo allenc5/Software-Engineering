@@ -1,2 +1,2 @@
 # Software-Engineering-LCA
-This for all LCA CSU33012 assignments.
+This for all LCA Software Engineering assignments 2020.
