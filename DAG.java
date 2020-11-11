@@ -1,223 +1,232 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-/*
- * public class Directed Acyclic Graph (DAG)
- * A graph in which node edges are directed and cannot form cycles, so you cannot
- * get back to a node by traversing it's edges.
- * 
- * FUNCTIONS:
- * 
- * Digraph(int V): create an empty digraph with V vertices
- *  
- * void addEdge(int v, int w) : Add a directed edge v->w
- * 
- * Iterable<Integer> adj(int v) : Return vertices pointing from v
- * 
- * int V() : number of vertices
- * 
- * boolean hasPth : if path exists between two nodes returns true
- * 
- * String toString() : string representation of the graph
- * 
- */
-
-public class DAG {
-
-	private final int V;
-	private final ArrayList<Integer>[] adj;
-	private final ArrayList<Integer>[] reverseAdj;			//Need for finding the LCA
-
-	//DAG constructor
+public class DAG
+{
+	private int V;							//number of vertices in the graph
+	private int E;							//number of edges in the graph
+	private ArrayList<Integer>[] adjacent;  //adjacent[V] = adjacency list for vertex V
+	private int [] indegree;				//indegree[V] = indegree of vertex V
+	
+	private boolean marked [];				//list of visited vertices
+	private boolean hasCycle;				//True if graph has cycle and therefore doesn't meet DAG criteria
+	private boolean stack [];				//
+	
+	//constructor to initialize an empty graph with size V
 	public DAG(int V)
 	{
-		this.V = V;
-		adj = (ArrayList<Integer>[]) new ArrayList[V];
-		
-		// For LCA
-		reverseAdj = (ArrayList<Integer>[]) new ArrayList[V];
-		
-		//Make an array list for each vertex 
-		for (int v = 0; v < V; v++)
+		if(V < 0)
 		{
-			adj[v] = new ArrayList<Integer>();	
+			throw new IllegalArgumentException("Number of vertices in the Directed Acyclic Graph must be greater than 0");
+		}
 		
-			//For LCA
-			reverseAdj[v] = new ArrayList<Integer>();
+		this.V = V;
+		this.E = 0;
+		indegree = new int[V];
+		marked = new boolean[V];
+		stack = new boolean[V];
+		adjacent = (ArrayList<Integer>[]) new ArrayList[V];
+		
+		for(int v = 0; v < V; v++)
+		{
+			adjacent[v] = new ArrayList<Integer>();
 		}
 	}
 	
-	//Adds an edge from vertex v to vertex w if conditions met, returns true if edge was successfully added
-	public boolean addEdge(int v, int w)
-	{
-		// acyclic -> Will not create a cycle by adding the edge
-		// 1. No self loops 
-		// 2. !hasPath w -> v i.e. can't get back to v after following the path from v to w
-		
-		//Make sure vertexes are both in range (not less than 0 or bigger than number of vertexes in the DAG)
-		if(v >= this.V || w >= this.V || v < 0 || w < 0)
-		{
-			return false;
-		}
-		
-		//Make sure vertexes are different so no self loops
-		//Make sure no path exits between w and v (can't get back to v from following path after following path v to w)
-		//Make sure v does not already have an edge already pointing to w 
-		if(v != w && !hasPath(w, v) && !adj[v].contains(w))
-		{
-			adj[v].add(w);
-			reverseAdj[w].add(v);
-			return true;
-		}	
-		else
-		{
-			return false;
-		}
-	}
-
-	//Returns number of vertexes in the DAG
+	//returns number of current vertices in DAG
 	public int V()
 	{
 		return V;
 	}
-
-	//Returns list of vertices pointing from the vertex v 
-	public ArrayList<Integer> adj(int v)
-	{ 
-		return adj[v];
-	}
-
-	//Returns reversed list of vertices pointing from the vertex v 
-	public ArrayList<Integer> reverseAdj(int v)
+	
+	//returns number of edges in DAG
+	public int E()
 	{
-		return reverseAdj[v];
+		return E;
 	}
-
-	//Checks if a path exists between to nodes by using depth first search
-	public boolean hasPath(int x, int y)
+	
+	//Adds directed edge from v to w
+	public void addEdge(int v, int w)
 	{
-		DirectedDFS dfsObject = new DirectedDFS(this, x);
-		return dfsObject.visited(y);
-	}
-
-	//lowestCommonAncestor code
-	public ArrayList<Integer> lowestCommonAncestor(int x, int y)
-	{
-		//STEPS TO FIND LCA(s):
-		//Mark all X's parents
-		//For each of X's parents, check if Y is child
-		//if it is
-		// 	get distance to X
-		// 	get distance to Y
-		//
-		// if max(xDist, yDist) < currentMaxDist
-		// 		empty bag and put in this node
-		//
-		// if max(xDist, yDist) == currentMaxDist
-		//		add this node to bag
-		//
-		
-		ArrayList<Integer> lcas = new ArrayList<Integer>();
-		int currentMaxDist = Integer.MAX_VALUE;
-		
-		
-		if(x==y || x>=this.V || y>=this.V || x<0 || y<0) { return lcas; } //If invalid input return empty bag.
-		
-		DirectedDFS dfsObject = new DirectedDFS(this, x);
-		dfsObject.reverseDfs(this, x);
-		int xDist, yDist;
-		
-		for(int v = 0; v < this.V; v++)
+		if((validateVertex(v) > 0) && (validateVertex(w) > 0))
 		{
+			adjacent[v].add(w);
+			indegree[w]++;
+			E++;
+		}
+		else
+		{
+			System.out.println("Please enter numbers between 0 and " + (V-1));
+		}		
+	}
+	
+	//checks if the vertex inputed is out of bounds
+	private int validateVertex(int v)
+	{
+		if(v < 0 || v >= V)
+		{
+			return -1;
+		}
+		else
+		{
+			return 1;
+		}
+	}
+	
+	//Returns number of directed edges to vertex v
+	public int indegree(int v)
+	{
+		if(validateVertex(v) > 0)
+		{
+			return indegree[v];
+		}
+		else
+		{
+			return -1;
+		}
 		
-			if(dfsObject.revVisited(v) && hasPath(v, y))
+	}
+	
+	//Returns number of directed edges from vertex v
+	public int outdegree(int v)
+	{
+		if(validateVertex(v) > 0)
+		{
+			return adjacent[v].size();
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
+	//Returns the adjacent vertices to v
+	public Iterable<Integer> adjacent(int v)
+	{
+		return adjacent[v];
+	}
+	
+	//returns hasCycle boolean
+	public boolean hasCycle()
+	{
+		return hasCycle;
+	}
+	//Checks if graph is a DAG and changes boolean values.
+	public void findCycle(int v)
+	{
+		marked[v] = true;
+		stack[v] = true;
+		
+		for(int w : adjacent(v))
+		{
+			if(!marked[w])
 			{
-				xDist = getDistance(v, x);
-				yDist = getDistance(v, y);
-				
-				if(Integer.max(xDist, yDist) < currentMaxDist)
-				{		
-					lcas = new ArrayList<Integer>();
-					lcas.add(v);
-					currentMaxDist = Integer.max(xDist, yDist);
-				}
-				else if(Integer.max(xDist, yDist) == currentMaxDist)
+				findCycle(w);
+			}
+			else if(stack[w])
+			{
+				hasCycle = true;
+				return;
+			}
+		}
+		stack[v] = false;
+	}
+	
+	//This public function is used implement the lowest common ancestor in a directed acyclic graph
+	public int findLCA(int v, int w)
+	{
+		findCycle(0);
+		
+		if(hasCycle) //Graph is not DAG
+		{
+			return -1;
+		}
+		else if(validateVertex(v) < 0 || validateVertex(w) < 0)
+		{
+			//Not valid vertices, ie. non-negative
+			return -1;
+		}
+		else if(E == 0)
+		{
+			//Graph has no edges, ie. empty
+			return -1;
+		}
+		
+		DAG reverse = reverse();
+		
+		ArrayList<Integer> array1 = reverse.BFS(v);
+		ArrayList<Integer> array2 = reverse.BFS(w);
+		ArrayList<Integer> commonAncestors = new ArrayList<Integer>();
+		
+		boolean found = false;
+		
+		for(int i = 0; i < array1.size(); i++)
+		{
+			for(int j = 0; j < array2.size(); j++)
+			{
+				if(array1.get(i) == array2.get(j))
 				{
-					lcas.add(v);
-					currentMaxDist = Integer.max(xDist, yDist);
+					commonAncestors.add(array1.get(i));
+					found = true;
 				}
 			}
 		}
-		return lcas;
-	}
-
-	private int getDistance(int x, int target)
-	{
-	    
-			if( x == target) { return 0; }
-			else {
-		        Queue<Integer> q = new LinkedList<Integer>();
-		        int[] distTo = new int[this.V];
-		        boolean[] marked = new boolean[this.V];
-		        
-		        for (int v = 0; v < this.V(); v++)
-		        {   distTo[v] = Integer.MAX_VALUE;}
-		        
-		        distTo[x] = 0;
-		        marked[x] = true;
-		        q.add(x);
 		
-		        while (!q.isEmpty()) {
-		            int v = q.remove();
-		            for (int w : this.adj(v)) {
-		                if (!marked[w]) {
-		                	
-		                	distTo[w] = distTo[v] + 1;
-		                    marked[w] = true;
-		                    
-		                    q.add(w);
-		                }
-		            }
-		        }
-		        
-		        return distTo[target];
+		if(found)
+		{
+			//Return first element in list - Lowest Common Ancestor
+			return commonAncestors.get(0);
+		}
+		else
+		{
+			return -1; //None found
+		}
+	}
+	
+	//Prints Breadth-First search from source s
+	public ArrayList<Integer> BFS(int s)
+	{
+		ArrayList<Integer> order = new ArrayList<Integer>();
+		boolean visited[] = new boolean[V]; //Marks vertices as not visit
+		LinkedList<Integer> queue = new LinkedList<Integer>();
+		
+		visited[s] = true;
+		queue.add(s);
+		
+		while(queue.size() != 0)
+		{
+			s = queue.poll(); //Sets s to the head of the list
+			order.add(s);
+			
+			//Find adjacent vertices to s. If not visited,
+			//mark as visited (true) and enqueue
+			Iterator<Integer> i = adjacent[s].listIterator();
+			
+			while(i.hasNext())
+			{
+				int n = i.next();
+				if(!visited[n])
+				{
+					visited[n] = true;
+					queue.add(n);
+				}
 			}
+		}
+		return order;
 	}
-
-	// Class to create a depth first search object on the directed graph
-	private class DirectedDFS
+	
+	//Reverse DAG
+	public DAG reverse()
 	{
-		private boolean[] marked;
-		private boolean[] revMarked;
-		
-		public DirectedDFS(DAG G, int s)
+		DAG reverse = new DAG(V);
+		for(int v = 0; v <V; v++)
 		{
-			marked = new boolean[G.V()];
-			revMarked = new boolean[G.V()];
-			dfs(G, s);
+			for(int w : adjacent(v))
+			{
+				reverse.addEdge(w, v);
+			}		
 		}
-		
-		
-		//standard depth first search - in the flow of direction.
-		private void dfs(DAG G, int v)
-		{
-			marked[v] = true;
-			for (int w : G.adj(v))
-			if (!marked[w]) dfs(G, w);
-		}
-		
-		
-		//depth first search against the flow of direction - used to find all parents.
-		private void reverseDfs(DAG G, int v)
-		{
-			revMarked[v] = true;
-			for (int w : G.reverseAdj(v))
-			if (!revMarked[w]) reverseDfs(G, w);
-		}
-		
-		public boolean visited(int v)
-		{ return marked[v]; }
-		
-		public boolean revVisited(int v)
-		{ return revMarked[v]; }
+		return reverse;
 	}
 }
